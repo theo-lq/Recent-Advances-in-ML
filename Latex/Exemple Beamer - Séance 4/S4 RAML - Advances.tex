@@ -1,0 +1,698 @@
+\documentclass{beamer}
+\input{styles/loadslides.tex}
+
+\title[]{Avancées des \emph{Large Langage Models} pour les réseaux de neurones}
+
+\subtitle{Recent Advances in Machine Learning}
+
+\author[]{Théo Lopès-Quintas}
+
+\institute{
+    BPCE Payment Services, \\
+    Université Paris Dauphine}
+\date{30 mai 2024}
+
+
+
+\begin{document}
+
+{
+\setbeamertemplate{footline}{} 
+\begin{frame}
+	\titlepage
+\end{frame}
+}
+\addtocounter{framenumber}{-1}
+
+
+
+%{
+%\setbeamertemplate{footline}{} 
+%\begin{frame}
+%	\tableofcontents
+%\end{frame}
+%}
+%\addtocounter{framenumber}{-1}
+
+\AtBeginSection[]
+{
+    \begin{frame}
+        \frametitle{}
+        \tableofcontents[currentsection]
+    \end{frame}
+}
+
+
+
+
+\section{Comment bien modifier la valeur du learning rate ?}
+
+\subsection{Il faut modifier la valeur du learning rate}
+
+\begin{frame}{}{}
+	On cherche à minimiser une fonction de perte $\mathcal{L}$ qui s'écrit très souvent en Machine Learning comme la somme d'une fonction sur chaque observations du dataset. On note $\hat{y}_i$ la prédiction d'un algorithme pour l'observation $x_i$ avec $i\leqslant n$ l'index de l'observation $i$. Pour un problème de {\color{primary}régression} et de {\color{secondary}classification}, on a par exemple :
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{eqnarray*}
+				{\color{primary}\mathcal{L}}(\theta) &=& \frac{1}{n}\sum_{i=1}^n (y_i - \hat{y}_i)^2\\
+				&=& \frac{1}{n}\sum_{i=1}^n {\color{primary}\ell_i}(\theta)
+			\end{eqnarray*}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{eqnarray*}
+				{\color{secondary}\mathcal{L}}(\theta) &=& -\frac{1}{n}\sum_{i=1}^n y_i\ln(\hat{y}_i)+(1-y_i)\ln(1-\hat{y}_i)\\
+				&=& - \frac{1}{n}\sum_{i=1}^n {\color{secondary}\ell_i}(\theta)
+			\end{eqnarray*}\newline
+		\end{column}
+	\end{columns}
+	
+	Ainsi, pour une unique mise à jour, on doit appliquer $n$ fonctions $\ell$. La descente de gradient stochastique consiste à sélectionner aléatoirement un index $i_t$ et mettre à jour les poids avec uniquement cette observations. La descente de gradient devient alors :
+	
+	\begin{equation*}
+		\theta_{t+1} = \theta_t - \eta_t\nabla\ell_{i_t}(\theta_t)
+	\end{equation*}
+\end{frame}
+
+
+
+
+\begin{frame}{}{}
+	Notons que la descente de gradient stochastique n'est pas vraiment une \textit{descente} : nous ne pourrons garantir une descente qu'en espérance. On suppose que $\mathcal{L}$ est différentiable et $\beta$-smooth, qu'il existe un minimum pour cette fonction et que chaque $\ell_i$ soit différentiable continue.
+	
+	\pause 	%PAUSE
+	
+	Alors, puisque $\mathcal{L}$ est $\beta$-smooth : 
+	
+	\begin{equation*}
+		\loss{\theta_{t+1}} \leqslant \loss{\theta_t} + \langle \nabla \loss{\theta_t}, {\color{secondary}\theta_{t+1}-\theta_t}\rangle + \frac{\beta}{2}\|\tikzmarknode{descent}{\highlight{secondary}{\theta_{t+1}-\theta_t}}\|^2
+	\end{equation*}
+
+	\begin{tikzpicture}[overlay, remember picture, >=stealth, nodes={align=left, inner ysep=1pt}, <-]
+		\path (descent.north) ++ (0, 2em) node[anchor=north west, color=secondary!60] (descent_point){$\displaystyle \eta_t\nabla\ell_{i_t}(\theta_t)$};
+		\draw [color=secondary!80](descent.north) |- ([xshift=-0.3ex, color=secondary] descent_point.south east);
+	\end{tikzpicture}
+
+	\pause %PAUSE
+	
+	Ainsi, en espérance sur le choix aléatoire de $i_t$, on a:
+	
+	\begin{equation*}
+		\expectation{\loss{\theta_{t+1}}} \leqslant \loss{\theta_t} + \eta_t\langle \nabla \loss{\theta_t}, \expectation{\nabla \ell_{i_t}(\theta_t)}\rangle + \frac{\beta{\color{primary}\eta_t^2}}{2} \expectation{\|\nabla \ell_{i_t}(\theta_t)\|^2}
+	\end{equation*}
+	
+	Cela ne nous assure pas pour autant une garantie de descente en espérance. Nous devons faire des hypothèses supplémentaires.
+\end{frame}
+
+
+
+
+\begin{frame}{}{}
+	\begin{hypothese}
+		Un index $i_t$ d'une mise à jour $t$ est tiré selon :
+		\begin{itemize}
+			\item $i_t$ ne dépend pas des index $i_0, \ldots, i_{t-1}$
+			\item $\displaystyle \nabla \ell_{i_t}(\theta_t)$ est un estimateur non biaisé de $\nabla \mathcal{L}(\theta_t)$
+			\item $\displaystyle \expectation{\|\nabla \ell_{i_t}(\theta_t)\|^2} \leqslant \sigma^2 + \|\mathcal{L}(\theta)\|^2$
+		\end{itemize}
+		\label{hyp:tirage}
+	\end{hypothese}
+	
+	Si les indices sont tirés uniformément alors les deux premières hypothèses sont vérifiées. Pour le troisième point, s'il existe $M>0$ tel que pour tout itérations $t$ on a $\displaystyle \|\nabla \ell_{i_t}(\theta_t)\| \leqslant M$, alors il est vérifié. Dans ce cas, on a une garantie de descente en espérance :
+	
+	\begin{equation}
+		\expectation{\loss{\theta_{t+1}}} \leqslant \loss{\theta_t}-\left(\eta_t-\frac{\beta\eta_t^2}{2}\right)\|\nabla \mathcal{L}(\theta_t)\|^2 + \frac{\beta\eta_t^2}{2}\sigma^2
+		\label{eq:ExpectedDescent}
+	\end{equation}
+	
+	En supposant que $\displaystyle \eta_t\leqslant \frac{1}{\beta}$.
+\end{frame}
+
+
+
+
+\begin{frame}{}{}
+	On se place dans le cadre d'une optimisation d'une fonction de perte $\mathcal{L}$ non convexe, mais $\beta$-smooth. On conserve les hypothèses (\ref{hyp:tirage}) précédentes. On note $\displaystyle \theta^* = \arg \min_{\theta\in \mathbb{R}^d}\loss{\theta}$
+	
+	\begin{theoreme}[Learning rate fixe]
+		On considère une descente de gradient stochastique avec $\eta_t=\eta$ tel que $\displaystyle \eta\in \left]0, \frac{1}{\beta}\right]$. Alors, pour tout $T \geqslant 1$:
+		\begin{equation*}
+			\expectation{\frac{1}{T}\sum_{t=0}^{T-1}\|\nabla\loss{\theta_t}\|^2} \leqslant \eta\beta\sigma^2 + \frac{2(\loss{\theta_0}-\loss{\theta^*})}{\eta T}
+		\end{equation*}
+		\label{thm:SGD_fixed_LR}
+	\end{theoreme}
+	
+	On a donc que $\displaystyle \lim_{T\rightarrow+\infty}\expectation{\min_{0\leqslant t\leqslant T-1}\|\nabla \mathcal{L}(\theta_t)\|^2} \in [0, \eta\beta\sigma^2]$ : le bruit nous empêche de converger vers un point de gradient nul. Ce n'est pas non plus une garantie de convergence vers le minimum global.
+\end{frame}
+
+
+
+\begin{frame}{}{}
+	On se place dans le cadre d'une optimisation d'une fonction de perte $\mathcal{L}$ non convexe, mais $\beta$-smooth. On conserve les hypothèses (\ref{hyp:tirage}) précédentes.On note $\displaystyle \theta^* = \arg \min_{\theta\in \mathbb{R}^d}\loss{\theta}$
+	
+	\begin{theoreme}[Pas de descente décroissant]
+		On considère une descente de gradient stochastique avec $\eta_t$ une suite décroissante telle que $\displaystyle \eta_t\in \left]0, \frac{1}{\beta}\right]$ et que : 
+		
+		\begin{equation*}
+			\sum_{t=0}^{+\infty} \eta_t=+\infty \quad \text{ et } \quad \sum_{t=0}^{+\infty} \eta_t^2<+\infty
+		\end{equation*}
+		
+		Alors, pour tout $T \geqslant 1$:
+		\begin{equation*}
+			\lim_{T\rightarrow +\infty} \expectation{\frac{1}{\displaystyle \sum_{t=0}^{T-1}\eta_t}\sum_{t=0}^{T-1} \eta_t\|\nabla\loss{\theta_t}\|^2} = 0 
+		\end{equation*}
+	\end{theoreme}
+	
+	Nous n'avons plus cette fois une convergence dans un intervalle proche du minimum, mais une convergence vers un point de gradient nul. D'où la nécessité d'avoir un échéancier pour le choix du learning rate. De même pour Nesterov, nous avions besoin d'un échéancier pour le momentum.
+\end{frame}
+
+
+
+
+
+
+
+\subsection{Échéanciers des Transformers}
+
+\begin{frame}{}{Échéancier des Transformers originels}
+	\textit{Attention is all you need} \cite{vaswani2017attention} introduit l'architecture transformers et également un échéancier associé :\newline
+	
+	\begin{equation*}
+		\eta_{\tikzmarknode{epoch}{\highlight{primary}{t}}} = \frac{1}{\sqrt{\tikzmarknode{dimension}{\highlight{purple}{d}}}} \min \left\{\frac{1}{\sqrt{\highlight{primary}{t}}}, \highlight{primary}{t}\tikzmarknode{warmup}{\highlight{secondary}{\tau}}^{-1.5}\right\}
+	\end{equation*}
+
+	\begin{tikzpicture}[overlay, remember picture, >=stealth, nodes={align=left, inner ysep=1pt}, <-]
+		\path (epoch) ++ (0, -1.5em) node[anchor=north east, color=primary!60] (epoch_point) {\textbf{Époque}};
+		\draw [color=primary!80](epoch.south) |- ([xshift=-0.3ex, color=primary] epoch_point.north west);
+		\path (dimension.south) ++ (0em, -1em) node[anchor=north west, color=purple!60] (dimension_point) {\textbf{Dimension du modèle = 512}};
+		\draw [color=purple!80](dimension.south) |- ([xshift=-0.3ex, color=purple] dimension_point.north east);
+		\path (warmup.north) ++ (0em, +2em) node[anchor=south west, color=secondary!60] (warmup_point) {\textbf{Époques de warmup = 4000}};
+		\draw [color=secondary!80](warmup.north) |- ([xshift=-0.3ex, color=secondary] warmup_point.south east);
+	\end{tikzpicture}\newline \newline
+
+
+	\begin{figure}[h!]
+		\centering
+		\begin{tikzpicture}[scale=0.7, samples=200, domain=0.001:10]
+			\draw[->] (0, 0) -- (10, 0) node[right]{Époque};
+			\draw[->] (0, 0) -- (0, 6) node[above]{$\eta_t \; (e^{-4})$};	
+			\draw[color=primary, thick] plot(\x, {min(75/sqrt(3*\x*512), 52.407843*\x)});
+		\end{tikzpicture}
+		\caption{Valeur du learning rate en fonction de l'époque}
+		\label{fig:schedule_attention}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}{}{Échéanciers cycliques}
+	\cite{smith2017Cyclical} propose une nouvelle manière de définir un échéancier : il sera cyclique.
+	
+	\begin{customquote}{Leslie Smith}{2015}
+		The essence of this learning rate policy comes from the observation that increasing the learning rate might have a short term negative effect and yet achieve a longer term beneficial effect
+	\end{customquote}
+	
+	\begin{figure}[h!]
+		\centering
+		\begin{tikzpicture}[scale=0.9]
+			\draw[->, thick] (0, 0) -- (10, 0); \draw[->, thick] (0, 0) -- (0, 5);
+			\draw[primary!25, fill=primary!25, opacity=0.25] (4, 1) rectangle (6, 4);
+			\draw[dashed, primary, thick] (0, 1) -- (10, 1) node[right]{Borne minimum}; \draw[dashed, primary, thick] (0, 4) -- (10, 4) node[right]{Borne maximum};
+			\draw[very thick, secondary] (0, 1) -- (2, 4) -- (4, 1) -- (6, 4) -- (8, 1) -- (10, 4);
+			\draw[<->, thick, primary] (4.1, 1.5) -- (5.9, 1.5); \draw[primary] (5, 1.5) node[below]{Step size};
+		\end{tikzpicture}
+		\caption{Échéancier triangulaire pour le learning rate}
+	\end{figure}
+\end{frame}
+
+
+
+\begin{frame}{}{Échéanciers cycliques}
+	Nous pouvons imaginer beaucoup de manières de réaliser ces cycles et on peut rajouter des bornes qui décroissent dans le temps également. Une manière est devenue standard dans tout les modèles fondamentaux : l'échéancier cosinus \cite{loshchilov2016Cosine}.\newline\newline
+	
+	\begin{equation*}
+		\eta_t = \eta_{\min}^{\color{secondary} i} + \frac{1}{2}\left(\eta_{\max}^{\color{secondary} i} - \eta_{\min}^{\color{secondary} i}\right)\left(1+\cos\left(\frac{\tikzmarknode{current}{\highlight{primary}{T_{\text{cur}}}}}{\tikzmarknode{cycle_length}{\highlight{secondary}{T_i}}}\pi\right)\right)
+	\end{equation*}\newline \newline
+
+
+	\begin{tikzpicture}[overlay, remember picture, >=stealth, nodes={align=left, inner ysep=1pt}, <-]
+		\path (current.north) ++ (-1em, +2.5em) node[anchor=north east, color=primary!60] (current_point) {\textbf{Nombre d'itérations réalisées dans le cycle $i$}};
+		\draw [color=primary!80](current.north) |- ([xshift=0ex, color=primary] current_point.south west);
+		\path (cycle_length.south) ++ (0em, -1.5em) node[anchor=north east, color=secondary!60] (cycle_length_point) {\textbf{Nombre d'itérations à réaliser dans le cycle $i$}};
+		\draw [color=secondary!80](cycle_length.south) |- ([xshift=-0.3ex, color=secondary] cycle_length_point.north west);
+	\end{tikzpicture}
+\end{frame}
+
+
+\begin{frame}{}{Échéanciers cosinus}
+	L'exploitation optimale de l'échéancier cosinus a été étudié dans plusieurs articles, citons-en deux :
+	\begin{itemize}
+		\item \cite{Chinchilla} montre qu'un cycle durant une époque (la totalité de l'entraînement d'un LLM) et réduisant de 10\% la valeur maximale semble optimal
+		\item \cite{popel2018training} montre que la période de warmup est critique : la longueur et le maximum sont très important pour la suite de l'entraînement
+	\end{itemize}
+	
+	\begin{figure}
+		\centering
+		\begin{tikzpicture}[scale=0.6, samples=100]
+			\draw[->, thick] (0, 0) -- (13, 0); \draw[->, thick] (0, 0) -- (0, 9);
+			\draw (0, 2) node[left]{$0.25$}; \draw (0, 4) node[left]{$0.5$}; \draw (0, 6) node[left]{$0.75$}; \draw (0, 8) node[left]{$1$};
+			\draw[thick, secondary] (0, 0) -- (1, 8);
+			\draw[thick, primary] (1, 8) -- (12, 0.8);
+			\draw[thick, secondary, domain=1:12]  plot(\x, {0.8 + 3.6 * (1+cos(deg(pi*(\x-1)/11)))});
+		\end{tikzpicture}
+		\caption{Rapport maximum LR / LR pour l'échéancier {\color{primary}décroissement linéaire} et {\color{secondary}cosinus} avec période de chauffe}
+	\end{figure}
+\end{frame}
+
+
+
+\section{Quelles sont les  bonnes non-linéarité dans un réseau de neurones ?}
+
+
+
+\subsection{GELU et SiLU}
+
+\begin{frame}{}{GELU}
+	\cite{hendrycks2016gaussian} introduit une nouvelle fonction d'activation : GELU. La volonté est de combiner les comportements de :
+	\begin{itemize}
+		\item \texthighlight{ReLU} : multiplier par 0 ou 1 l'input
+		\item \texthighlight{Dropout} : multiplier par 0 ou 1 aléatoirement
+	\end{itemize}
+	Pour le faire, on propose de multiplier l'input par $m \sim \text{Bernoulli}(\phi(x))$ avec $\phi(x) = \probability{X \leqslant x}$ et $X\sim \mathcal{N}(0, 1)$. Mais ce comportement doit être déterministe pour la phase d'inférence, donc pour approcher au mieux le comportement de cette régularisation : 
+	
+	\begin{equation*}
+		\GELU(x) = x\probability{X \leqslant x} = x\phi(x)
+	\end{equation*}
+
+	Notons quelques propriétés:
+	\begin{itemize}
+		\item GELU est $\mathcal{C}^1$ sur $\mathbb{R}$, en particulier au voisinage de 0 contrairement à ReLU
+		\item GELU n'est pas monotone
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{}{SiLU}
+	Dans le même article \cite{hendrycks2016gaussian} est introduit SiLU comme une variante de GELU où l'on choisit la distribution logistique au lieu de gaussienne :
+	
+	\begin{equation*}
+		\SiLU(x) = x \sigma(x) \quad \text{avec} \quad \sigma(x) = \frac{1}{1+e^{-x}}
+	\end{equation*}
+	
+	\begin{columns}
+		\begin{column}{0.4\textwidth}
+			On conserve les deux particularité de GELU par rapport à ReLU : non monotonie et $\mathcal{C}^1$ partout. Cela permet d'éviter le phénomène de mort de neurones et une meilleure transmission des informations au voisinage de zéro.
+		\end{column}
+		
+		\begin{column}{0.6\textwidth}
+			\begin{figure}[h!]
+				\centering
+				\begin{tikzpicture}[scale=1, samples=200, domain=-3:3]
+				\draw[->] (-3, 0) -- (3, 0) node[right]{$x$};
+				\draw[->] (0, -1) -- (0, 3) node[above]{$f(x)$};
+				\draw[color=primary, thick] plot(\x, {max(0, \x)});
+				\draw[color=secondary, thick] plot(\x, {\x * (1/(1+exp(-\x)))});
+				\draw[color=tertiary, thick] plot(\x, {\x * (1/(1+exp(-1.702*\x)))});
+			\end{tikzpicture}
+			\caption{Fonctions {\color{primary}ReLU}, {\color{secondary}SiLU} et {\color{tertiary}GELU}}
+			\end{figure}
+		\end{column}
+	\end{columns}
+	
+\end{frame}
+
+\subsection{Gated Linear Unit}
+
+\begin{frame}{}{Cellule LSTM}
+	\begin{figure}[h!]
+		\centering
+		\begin{tikzpicture}[scale=1]
+			\draw[blue, fill=blue, opacity=0.1, rounded corners] (-1.5, 5) rectangle (8.5, 6); \draw[thick, blue, ->] (-2, 5.5) node[left]{$c_{t-1}$} -- (9, 5.5)node[right]{$c_{t}$}; 
+			\draw[red, fill=red, opacity=0.1, rounded corners] (-1.5, 0.5) rectangle (8.5, 1.5); \draw[thick, red, ->] (-2, 1) node[left]{$h_{t-1}$} -- (9, 1) node[right]{$h_{t-1}$};
+			\draw[thick, rounded corners] (-1, 0) rectangle (8, 6.5);
+			\draw[thick] (1, 2.5) node{$\sigma$} circle (0.5); \draw[thick] (2.5, 2.5) node{$\sigma$} circle (0.5); \draw[thick] (4, 2.5) node{$\tanh$} circle (0.5); \draw[thick] (4, 4) node{$\bigotimes$} circle (0.25); \draw[thick] (7, 4) node{$\tanh$} circle (0.5);
+			\draw[thick, blue, fill=blue!10] (1, 5.5) node{$\bigotimes$} circle (0.25); \draw[thick, blue, fill=blue!10] (4, 5.5) node{$\bigoplus$} circle (0.25); \draw[thick, red, fill=red!10] (7, 1) node{$\bigotimes$} circle(0.25);  \draw[thick, red, fill=red!10] (5.5, 1) node{$\sigma$} circle (0.5);
+			\draw[thick] (0, -0.5) node[below]{$x_t$} -- (0, 1)node[red]{$\bullet$};
+			\draw[thick] (1, 1) node[red]{$\bullet$} -- (1, 2); \draw[thick] (1, 3) -- (1, 5.25); 
+			\draw[thick] (2.5, 1) node[red]{$\bullet$} -- (2.5, 2); \draw[thick] (2.5, 3) -- (2.5, 4) -- (3.75, 4);
+			\draw[thick] (4, 1) node[red]{$\bullet$} -- (4, 2); \draw[thick] (4, 3) -- (4, 3.75); \draw[thick] (4, 4.25) -- (4, 5.25);
+			\draw[thick] (7, 5.5) node[blue]{$\bullet$} -- (7, 4.5); \draw[thick] (7, 3.5) -- (7, 1.25);
+			\draw[thick, densely dashed, purple, rounded corners] (0.4, 0.4) rectangle (1.6, 3.1); \draw (1, 0.4) node[below, purple]{\footnotesize \textbf{Forget}};
+			\draw[thick, densely dashed, purple, rounded corners] (1.9, 0.4) rectangle (3.1, 3.1); \draw (2.5, 0.4) node[below, purple]{\footnotesize \textbf{Input}};
+			\draw[thick, densely dashed, purple, rounded corners] (4.9, 0.4) rectangle (6.1, 1.6); \draw (5.5, 0.4) node[below, purple]{\footnotesize \textbf{Output}};
+		\end{tikzpicture}
+		\caption{Schéma d'un LSTM avec état de cellule {\color{blue} $(c_t)_{t\in \mathbb{N}}$} et état caché {\color{red} $(h_t)_{t\in \mathbb{N}}$}}
+		\label{fig:LSTM}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}{}{}
+	\cite{dauphin2016language} reprend l'idée de LSTM de contrôler à plusieurs niveau la quantité d'informations que l'on transmet en introduisant une nouvelle manière de calculées les couches cachées $h_l$ avec $l\leqslant L$ la $l$-ième couche cachée du réseau de neurones à $L$ couches :\newline
+
+	\begin{equation*}
+		\forall l \leqslant L, \quad h_l(\tikzmarknode{X_Input}{\highlight{red}{X}}) = (\highlight{red}{X}\tikzmarknode{Left_W}{\highlight{blue}{W}}+\tikzmarknode{Left_b}{\highlight{blue}{b}}) \otimes \sigma (\highlight{red}{X}\tikzmarknode{Right_V}{\highlight{blue}{V}}+\tikzmarknode{Right_c}{\highlight{blue}{c}})
+	\end{equation*}
+
+	\begin{tikzpicture}[overlay, remember picture, >=stealth, nodes={align=left, inner ysep=1pt}, <-]
+		\path (Left_W.south) ++ (-5em, -2em) node[anchor=south west, color=blue!60] {\textbf{Poids couche 1}};
+		\draw [<->, color=blue!80](Left_W.south) -- ++(0,-0.3)  -| node[] {} (Left_b.south);
+		\path (Right_V.south) ++ (-0.5em, -2em) node[anchor=south west, color=blue!60] {\textbf{Poids couche 2}};
+		\draw [<->, color=blue!80](Right_V.south) -- ++(0,-0.3)  -| node[] {} (Right_c.south);
+		\path (X_Input.north) ++ (0em, +1em) node[anchor=south east, color=red!60] (X_Input_point) {\textbf{Matrice input}};
+		\draw [color=red!80](X_Input.north) |- ([xshift=-0.3ex, color=red] X_Input_point.south west);
+	\end{tikzpicture}\newline
+
+	On a noté $\otimes$ le produit terme à terme et $\sigma$ la fonction sigmoid. 
+\end{frame}
+
+
+\begin{frame}{}{}
+	\cite{shazeer2020glu} pousse la réflexion plus loin et propose de remplacer la fonction $\sigma$ par d'autres fonctions d'activation classiques. En pratique, les résultats ne sont pas vraiment des fonctions d'activation mais plutôt de nouveaux blocs d'architecture. Parmi celles-ci, notons :
+
+	\begin{columns}
+		\begin{column}{0.4\textwidth}
+			\begin{eqnarray*}
+				\GEGLU(X) &=& \GELU(XW+b) \otimes (XV+c)\\
+				\SwiGLU(X) &=& \SiLU(XW+b) \otimes (XV+c)
+			\end{eqnarray*}
+		\end{column}
+		
+		\begin{column}{0.6\textwidth}
+			\begin{figure}[h!]
+				\centering
+				\begin{tikzpicture}[scale=0.9]
+					\draw[thick, blue] (0.5, 3) rectangle (1, 5); \draw[blue] (0.75, 5) node[above]{\textbf{Input}};
+					\draw[thick, red, rounded corners] (3, 0) rectangle (4, 2); \draw[red] (3.5, 0) node[below]{\textbf{$(V, c)$}};
+					\draw[thick, red, rounded corners] (3, 3) rectangle (4, 5); \draw[red] (3.5, 5) node[above]{\textbf{$(W, b)$}};
+					\draw[thick, blue] (7, 3) rectangle (7.5, 5); \draw[blue] (7.25, 5) node[above]{\textbf{Output}};
+					\draw[thick, blue] (1, 4) -- (1.5, 4) -- (1.5, 1) -- (3, 1) node[red]{$\bullet$};
+					\draw[thick, blue] (1, 4) -- (3, 4) node[red]{$\bullet$};
+					\draw[thick, red] (5.5, 4) node{$\bigotimes$} circle(0.5);
+					\draw[thick, red] (5.5, 2) node{$a$} circle(0.5);
+					\draw[thick, red] (4, 1) -- (5.5, 1) -- (5.5, 1.5) node{$\bullet$};
+					\draw[thick, red] (5.5, 2.5) -- (5.5, 3.5) node{$\bullet$};
+					\draw[thick, red] (4, 4) -- (5, 4) node{$\bullet$};
+					\draw[thick, red] (6, 4) -- (7, 4) node[blue]{$\bullet$};
+				\end{tikzpicture}
+				\caption{Architecture GLU avec une fonction d'activation {\color{red}$a$}}
+			\end{figure}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+
+\begin{frame}{}{}
+	Dans l'architecture Transformers les blocs \textit{position-wise feed-forward networks} (FFN) sont les blocs impactés par cette modification. A noter que de plus en plus de LLM suppriment les vecteurs de biais, pour atteindre les blocs FFN suivants :
+
+	\begin{figure}[h!]
+		\centering
+		\begin{tikzpicture}[scale=0.9]
+			\draw[thick, blue] (0.5, 3) rectangle (1, 5); \draw[blue] (0.75, 5) node[above]{\textbf{Input}};
+			\draw[thick, red, rounded corners] (3, 0) rectangle (4, 2); \draw[red] (3.5, 0) node[below]{\textbf{$V$}};
+			\draw[thick, red, rounded corners] (3, 3) rectangle (4, 5); \draw[red] (3.5, 5) node[above]{\textbf{$W_1$}};
+			\draw[thick, red, rounded corners] (7, 3) rectangle (8, 5); \draw[red] (7.5, 5) node[above]{\textbf{$W_2$}};
+			\draw[thick, blue] (9, 3) rectangle (9.5, 5); \draw[blue] (9.25, 5) node[above]{\textbf{Output}};
+			\draw[thick, blue] (1, 4) -- (1.5, 4) -- (1.5, 1) -- (3, 1) node[red]{$\bullet$};
+			\draw[thick, blue] (1, 4) -- (3, 4) node[red]{$\bullet$};
+			\draw[thick, red] (5.5, 4) node{$\bigotimes$} circle(0.5);
+			\draw[thick, red] (5.5, 2) node{$a$} circle(0.5);
+			\draw[thick, red] (4, 1) -- (5.5, 1) -- (5.5, 1.5) node{$\bullet$};
+			\draw[thick, red] (5.5, 2.5) -- (5.5, 3.5) node{$\bullet$};
+			\draw[thick, red] (4, 4) -- (5, 4) node{$\bullet$};
+			\draw[thick, red] (6, 4) -- (7, 4) node[red]{$\bullet$};
+			\draw[thick, red] (8, 4) -- (9, 4) node[blue]{$\bullet$};
+		\end{tikzpicture}
+		\caption{Architecture FFN avec une fonction d'activation GLU {\color{red}$a$}}
+	\end{figure}
+	
+	Pour conserver un ordre de grandeur similaire en termes de paramètres, il faut réduire le nombre de neurones que l'on place sur chaque couche.
+\end{frame}
+
+
+
+
+\section{Comment appliquer les avancées du NLP pour la vision ?}
+
+
+\begin{frame}{}{Compétition ImageNet et modèles}
+	Depuis son introduction, l'utilisation des réseaux convolutionnel \cite{lecun1998gradient} fait consensus dans tous les domaines traitant avec des images. La structuration autour des datasets commun MNIST et FashionMNIST \cite{lecun2010mnist,fashionMNIST} ou la compétition ImageNet qui a été source d'architecture et briques élémentaires des réseaux de neurones, on peut citer : \newline
+	
+	\pause %PAUSE
+	
+	\begin{itemize}
+		\item \texthighlight{AlexNet} \cite{krizhevsky2012imagenet} : première utilisation des GPU pour l'entraînement, et du Dropout
+		\item \texthighlight{Inception v1} \cite{szegedy2015going} : introduction du module Inception: il consiste à travailler à plusieurs échelles en parallèle pour avoir une vision locale et plus global en même temps
+		\item \texthighlight{VGG} \cite{simonyan2014very} : plutôt que de faire varier la taille des convolutions, il suffit d'en placer plus de petite taille pour réduire la taille du modèle sans changer la capacité de représentation
+		\item \texthighlight{ResNet} \cite{he2016deep} : introduction des ResBlock
+	\end{itemize}
+\end{frame}
+
+\subsection{Vision Transformers}
+
+\begin{frame}{}{}
+	Suite à la proposition du mécanisme d'attention, des travaux avec les réseaux convolutionnels ont été mené. On peut citer :
+
+	\begin{itemize}
+		\item \cite{bello2019attention} adresse le problème de localité des réseaux convolutionnel en augmentant les features avec le mécanisme d'attention
+		\item \cite{wu2020visual} propose le \textit{Visual Transformer} (VT). Une image est d'abord traité par des couches de convolutions, et ce résultat est placé dans 16 catégories sémantiques, traité par la suite par un transformer
+	\end{itemize}
+	
+	\cite{dosovitskiy2020image} propose en octobre 2020 les Vision Transformers (ViT) qui s'appuie uniquement sur l'architecture transformers, sans couches de convolution. Cependant, une image n'est pas une séquence de vecteur. Ainsi, l'article propose de brutalement de transformer une image en patch qui ensemble formeront une séquence, donc une entrée pour un transformer.
+\end{frame}
+
+\begin{frame}{}{}
+	\begin{exercice}[Image en patch]
+		On considère une image de taille $(H, W)$ pixels. On souhaite obtenir des patchs de taille $(P, P)$.
+		\begin{enumerate}
+			\item On note $N$ le nombre de patch. Que vaut $N$ dans notre cas ?
+			\item Chaque patch est aplati (\textit{flattened}). Quelle est la taille de la séquence total pour l'image de départ ?
+			\item Quelle est la taille de la séquence totale pour une image de taille $(H, W, C)$ où $C$ représente le nombre de canal ?
+			\item Faire l'application numérique pour une image de taille (6, 8, 3) avec $P=2$
+		\end{enumerate}
+	\end{exercice}
+	
+	L'objectif d'aplatir l'image via des patchs est de conserver une idée de \textit{localité} : si l'on aplati l'image brutalement on perd la structure.
+\end{frame}
+
+\begin{frame}{}{}
+	Les blocks Transformers exploitent la fonction d'activation GELU et la couche de Layer Normalization Il y a également plusieurs tailles de modèles qui sont disponible pour pouvoir traiter différents usages. Il est important de préciser que pour obtenir des performances compétitive avec ces réseaux, il semble nécessaire empiriquement, d'après les deux articles, de traiter avec de très large volume de données tant en nombre qu'en classe à prédire. \newline
+
+	\begin{table}[h!]
+		\begin{center}
+			\begin{tabular}{@{}lccc}\toprule
+				Modèle & Année & Paramètres (M)& Accuracy (\%) \\\midrule
+				ResNet-101 & 2015-12 & 45 & 78.2\\[0.25cm]
+				ViT-B/16 & 2020-10 & 87 & 85.4\\
+				ViT-L/16 & 2020-10 & 305 & 86.8\\[0.25cm]
+				Swin-B & 2021-08 & 88 & 86.4\\
+				Swin-L & 2021-08 & 197 & 87.3\\\bottomrule
+			\end{tabular}
+		\end{center}
+		\caption{Comparaison des performances d'accuracy sur ImageNet-1K, pré-entraîné sur ImageNet-22K pour des images de taille $384^2$}
+	\end{table}
+\end{frame}
+
+
+\subsection{ConvNeXt}
+
+\begin{frame}{}{}
+	\cite{liu2022convnet} déroule un plan de travail pour moderniser les réseaux convolutionnels en utilisant uniquement des couches de convolutions, mais en se nourrissant des avancées des Transformers. Son point de départ est le ResNet 50 \cite{he2016deep}. Les premiers changement, avant de toucher à l'architecture, portent sur les méthodes d'entraînement avec entre autres :\newline
+	
+	\begin{itemize}
+		\item Entraînement plus long (de 90 époques à 300 époques) avec une data augmentation plus complète
+		\item L'optimiser AdamW est exploité avec un batch size de 4096 au lieu de 256
+		\item L'échéancier du learning rate suit un échéancier cosinus\newline
+	\end{itemize}
+	
+	On obtient un gain de performance de 2.7 points (selon l'article) en \textit{mettant à jour} la procédure d'entraînement.
+\end{frame}
+
+\begin{frame}{}{}
+	Notons quelques-un des autres changement sont présentés :
+	\begin{itemize}
+		\item \texthighlight{Plus grande taille de filtre}: la taille $3\times3$ est remplacé par une taille $7\times7$
+		\item \texthighlight{Moins de fonction d'activation}: une fonction d'activation par bloc permet de gagner 0.7 point
+		\item \texthighlight{Moins de couche de normalisation}: de deux couches de Batch-Normalization à une seule couche de Layer-Normalization : on gagne deux fois 0.1 point de performance
+	\end{itemize}
+	
+	\begin{table}[h!]
+		\begin{center}
+			\begin{tabular}{@{}lccc}\toprule
+				Modèle & Année & Paramètres (M)& Accuracy (\%) \\\midrule
+				ResNet-101 & 2015-12 & 45 & 78.2\\[0.2cm]
+				ViT-B/16 & 2020-10 & 87 & 85.4\\
+				ViT-L/16 & 2020-10 & 305 & 86.8\\[0.2cm]
+				Swin-B & 2021-08 & 88 & 86.4\\
+				Swin-L & 2021-08 & 197 & 87.3\\[0.2cm]
+				ConvNeXt-T & 2022-03 & 29 & 82.9\\
+				ConvNeXt-S & 2022-03 & 50 & 85.8\\
+				ConvNeXt-B & 2022-03 & 89 & 86.8\\
+				ConvNeXt-L & 2022-03 & 198 & 87.5\\
+				ConvNeXt-XL & 2022-03 & 350 & 87.8\\\bottomrule
+			\end{tabular}
+		\end{center}
+		\caption{Comparaison des performances d'accuracy sur ImageNet-1K, pré-entraîné sur ImageNet-22K pour des images de taille $384^2$}
+	\end{table}
+\end{frame}
+
+
+\begin{frame}[allowframebreaks]{Bibliographie}
+	\bibliographystyle{apalike}
+	\bibliography{Bibli_RAML_S4}
+\end{frame}
+
+
+
+\appendix
+
+\section{Annexe : SGD par mini-batch}
+
+
+\begin{frame}{}{SGD par mini-batch}
+	Afin d'obtenir des convergences plus proche du minimum, nous pouvons considérer $n_B$ observations puis mettre à jour. Si $n_B=1$ on obtient la descente de gradient stochastique et si $n_B=n$ on retrouve la descente de gradient classique. La descente de gradient par mini-batch est donc un compromis entre les deux descentes présentées.\\
+	 On note $\mathcal{B}_t$ l'ensemble des index choisit aléatoirement tel que $\left|\mathcal{B}_t\right| = n_B$, on a: 
+	 
+	 \begin{equation*}
+	 	\theta_{t+1} = \theta_t - \eta_t \left(\frac{1}{n_B} \sum_{i\in \mathcal{B}_t} \nabla\ell_i(\theta_t)\right)
+	\end{equation*}
+	
+	\begin{figure}
+		\centering
+		\begin{subfigure}[t]{0.45\linewidth}
+			\centering
+			\begin{tikzpicture}[scale = 2]
+				\draw[thin, dashed] (1.5, 1) -- (0, 0);
+				\draw[thick, blue, ->] (1.5, 1) -- (1, 0.2);
+				\draw[thick, red, ->] (1.5, 1) -- (0.5, 0.7);
+				\draw[thick, teal, ->] (1.5, 1) -- (1, 1.1);
+				\draw (1.5, 1) node{$\bullet$} node[above]{$\theta_t$}; 
+				\draw (0, 0) node{$\bullet$} node[above left]{$\theta^*$}; 
+			\end{tikzpicture}
+			\caption{Calcul des $-\nabla\ell_i(\theta_t)$ pour un batch $\mathcal{B}_t$}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\linewidth}
+			\centering
+			\begin{tikzpicture}[scale = 2]
+				\draw[thin, dashed] (1.5, 1) -- (0, 0);
+				\draw[thick, blue, ->] (1.5, 1) -- (1.33, 0.73);
+				\draw[thick, red, ->] (1.33, 0.73) -- (1, 0.63);
+				\draw[thick, teal, ->] (1, 0.63)-- (0.83, 0.67);
+				\draw[very thick, ->] (1.5, 1) -- (0.83, 0.67);
+				\draw (1.5, 1) node{$\bullet$} node[above]{$\theta_t$}; 
+				\draw (0, 0) node{$\bullet$} node[above left]{$\theta^*$}; 
+			\end{tikzpicture}
+			\caption{Mise à jour des poids}
+		\end{subfigure}
+	\end{figure}
+\end{frame}
+
+
+
+
+\begin{frame}{}{SGD par mini-batch : Réduction de variance}
+	On conserve les hypothèses (\ref{hyp:tirage}) que l'on a faite sur la fonction de perte et l'aléatoire de tirage des index dont les deux dernières conditions sont :
+	
+	\begin{itemize}
+		\item $\displaystyle \nabla \ell_{i_t}(\theta_t)$ est un estimateur non biaisé de $\nabla \mathcal{L}(\theta_t)$
+		\item $\displaystyle \expectation{\|\nabla \ell_{i_t}(\theta_t)\|^2} \leqslant \sigma^2 + \|\mathcal{L}(\theta)\|^2$\newline
+	\end{itemize}
+	
+	On obtient le résultat suivant :\newline
+	
+	\begin{proposition}[Variance]
+		La variance d'une estimation par descente de gradient stochastique par mini-batch utilisant $n_B$ échantillons avec remise vérifie :
+		\begin{equation*}
+			\expectation{\left\|\frac{1}{n_B} \sum_{i\in \mathcal{B}_t}\nabla \ell_i(\theta_t)\right\|^2} \leqslant \frac{\sigma^2}{n_B} + \|\nabla\mathcal{L}(\theta_t)\|^2
+			\label{prop:VarianceMiniBatch}
+		\end{equation*}
+	\end{proposition}
+\end{frame}
+
+
+
+
+\begin{frame}{}{SGD par mini-batch : Garantie de convergence}
+	A l'aide de la proposition \ref{prop:VarianceMiniBatch} nous pouvons déduire un résultat similaire au théorème \ref{thm:SGD_fixed_LR} qui le généralise.
+	
+	\begin{theoreme}[Learning rate fixe pour SGD par mini-batch]
+		On considère une descente de gradient stochastique par mini-batch avec remise de taille $n_B$ avec $\eta_t=\eta$ tel que $\displaystyle \eta\in \left]0, \frac{1}{\beta}\right]$. Alors, pour tout $T \geqslant 1$:
+		\begin{equation*}
+			\expectation{\frac{1}{T}\sum_{t=0}^{T-1}\|\nabla\loss{\theta_t}\|^2} \leqslant \frac{\eta\beta\sigma^2}{n_B} + \frac{2(\loss{\theta_0}-\loss{\theta^*})}{\eta T}
+		\end{equation*}
+		\label{thm:SGD_MiniBatch}
+	\end{theoreme}
+	
+	On obtient alors que $\displaystyle \lim_{T\rightarrow+\infty}\expectation{\min_{0\leqslant t\leqslant T-1}\|\nabla \mathcal{L}(\theta_t)\|^2} \in \left[0, \frac{\eta\beta\sigma^2}{n_B}\right]$.\newline
+	
+	Il est important de noter que l'on ne traite que du cas où le mini-batch est construit avec remise et que l'on a supposé des indépendances, distributions identiques et des estimations non biaisées. Il est difficile de s'en assurer en pratique.
+\end{frame}
+
+
+
+
+\section{Annexe : Preuves}
+
+\begin{frame}{}{Théorème \ref{thm:SGD_fixed_LR} : Convergence pour SGD avec learning rate fixe}
+	Soit $T\leqslant 1$ et $t\leqslant T$ une étape. L'inéquation \ref{eq:ExpectedDescent} se réécrit comme :
+	
+	\begin{eqnarray*}
+		\expectation{\loss{\theta_{t+1}}-\loss{\theta_t}} &\leqslant& - \left(\eta - \frac{\eta^2\beta}{2}\right)\|\nabla \loss{\theta_t}\|^2 + \frac{\eta^2\beta}{2}\sigma^2\\
+		&\leqslant& -\frac{\eta}{2}\|\nabla \loss{\theta_t}\|^2 + \frac{\eta^2\beta}{2}\sigma^2 \quad \text{car } \eta \in \left]0, \frac{1}{\beta}\right]
+	\end{eqnarray*}
+	
+	Puisque $\loss{\theta_t} \geqslant \loss{\theta^*}$ pour toute étape $t$, en sommant sur toute les étapes, on a en espérance :
+	
+	\begin{eqnarray*}
+		\loss{\theta^*}-\loss{\theta_0} \leqslant \expectation{\loss{\theta_T}-\loss{\theta_0}} &\leqslant& -\frac{\eta}{2}\sum_{t=0}^{T-1}\expectation{\|\nabla \loss{\theta_t}\|^2} + T\frac{\eta^2\beta}{2}\sigma^2\\
+		\expectation{\frac{1}{T}\sum_{t=0}^{T-1}\|\nabla\loss{\theta_t}\|^2} &\leqslant& \eta\beta\sigma^2 + \frac{2(\loss{\theta_0}-\loss{\theta^*})}{\eta T}
+	\end{eqnarray*}
+	
+	D'où $\displaystyle \lim_{T\rightarrow+\infty}\expectation{\min_{0\leqslant t\leqslant T-1}\|\nabla \mathcal{L}(\theta_t)\|^2} \in [0, \eta\beta\sigma^2]$
+\end{frame}
+
+
+\begin{frame}{}{Proposition \ref{prop:VarianceMiniBatch} : Réduction de variance pour SGD avec mini-batch}
+	On rappelle que l'on a fait les hypothèses suivante sur la constitution du mini-batch pour $i\in \mathcal{B}_t$ à une époque $t$ :
+	\begin{itemize}
+		\item $\displaystyle \nabla \ell_{i}(\theta_t)$ est un estimateur non biaisé de $\nabla \mathcal{L}(\theta_t)$
+		\item $\displaystyle \expectation{\|\nabla \ell_i(\theta_t)\|^2} \leqslant \sigma^2 + \|\mathcal{L}(\theta)\|^2$
+	\end{itemize}
+	
+	On a supposé de plus qu'il y a indépendance et identique distribution pour les $\nabla\ell_i$. Ainsi, on a :
+	
+	\begin{eqnarray*}
+		\expectation{\left\|\frac{1}{n_B}\sum_{i\in\mathcal{B}}\nabla\ell_i(\theta_t)\right\|^2} - \left\|\expectation{\frac{1}{n_B}\sum_{i\in\mathcal{B}}\nabla\ell_i(\theta_t)}\right\|^2 &=& \frac{1}{n_B}\left(\expectation{\|\nabla\ell_i(\theta_t)\|^2} - \|\loss{\theta_t}\|^2\right)\\
+		&\leqslant& \frac{\sigma^2}{n_B} \quad \text{avec le second point}
+	\end{eqnarray*}
+	
+	Le premier point nous indique que :  $\displaystyle \expectation{\frac{1}{n_B}\sum_{i\in\mathcal{B}}\nabla\ell_i(\theta_t)} = \frac{1}{n_B}\sum_{i\in\mathcal{B}} \expectation{\nabla\ell_i(\theta_t)} = \nabla \loss{\theta_t}$\\
+	On a donc finalement que :
+	
+	\begin{equation*}
+		\expectation{\left\|\frac{1}{n_B}\sum_{i\in\mathcal{B}}\nabla\ell_i(\theta_t)\right\|^2} \leqslant \frac{\sigma^2}{n_B} + \|\loss{\theta_t}\|^2
+	\end{equation*}
+\end{frame}
+
+
+
+\begin{frame}{}{Théorème \ref{thm:SGD_MiniBatch} : Convergence pour SGD par mini-batch avec learning rate fixe}
+	La démonstration du théorème \ref{thm:SGD_MiniBatch} est similaire à celle du théorème \ref{thm:SGD_fixed_LR} mais il faut prendre en compte le mini-batch. Puisque $\mathcal{L}$ est $\beta$-smooth : 
+	\begin{eqnarray*}
+		\loss{\theta_{t+1}} &\leqslant& \loss{\theta_t} + \langle \nabla \loss{\theta_t}, \theta_{t+1}-\theta_t\rangle + \frac{\beta}{2}\|\theta_{t+1}-\theta_t\|^2\\
+		&\leqslant& \loss{\theta_t} - \eta_t\langle \nabla \loss{\theta_t}, \frac{1}{n_B}\sum_{i\in \mathcal{B}}\nabla \ell_i(\theta_t)\rangle + \frac{\beta\eta^2}{2} \left\|\frac{1}{n_B}\sum_{i\in \mathcal{B}}\nabla \ell_i(\theta_t)\right\|^2
+	\end{eqnarray*}
+	
+	Ainsi, en espérance sur le choix aléatoire de $\mathcal{B}_t$ :
+	\begin{equation*}
+		\expectation{\loss{\theta_{t+1}}} \leqslant \loss{\theta_t} - \eta_t \|\nabla \loss{\theta_t}\|^2 + \frac{\beta\eta_t^2}{2} \expectation{\|\frac{1}{n_B}\sum_{i\in \mathcal{B}_t}\nabla\ell_{i}(\theta_t)\|^2}
+	\end{equation*}
+	
+	A l'aide de la proposition \ref{prop:VarianceMiniBatch} on obtient finalement :
+	\begin{equation}
+		\expectation{\loss{\theta_{t+1}}} \leqslant \loss{\theta_t} - \left(\eta_t-\frac{\beta\eta^2}{2}\right)\|\nabla\loss{\theta_t}\|^2 + \frac{\beta\eta^2}{2n_B}\sigma^2
+		\label{eq:ExpectedDescentMiniBatch}
+	\end{equation}
+	
+	On utilise l'inéquation \ref{eq:ExpectedDescentMiniBatch} comme point de départ à la place de l'inéquation \ref{eq:ExpectedDescent}, puis \textit{mutatis mutandis} dans la démonstration du théorème \ref{thm:SGD_MiniBatch}.
+\end{frame}
+
+\end{document}
