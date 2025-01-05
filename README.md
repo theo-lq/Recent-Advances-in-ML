@@ -20,7 +20,7 @@ La soutenance est une présentation à l'ensemble de la promotion portant soit s
 4. Positionnal embedding : [RoPE](https://arxiv.org/abs/2104.09864) (avril 2021) et [CoPE](https://arxiv.org/abs/2405.18719) (mai 2024)
 5. RHLF : [DPO](https://arxiv.org/abs/2305.18290) (mai 2023)
 6. Scaling laws : [Kaplan](https://arxiv.org/abs/2001.08361) (janvier 2020), [Chinchilla](https://arxiv.org/abs/2203.15556) (mars 2022) et [Reconcieling Kaplan and Chinchilla](https://arxiv.org/abs/2406.12907) (juin 2024)
-7. Synthetic datasets : [Textbooks are all you need](https://arxiv.org/abs/2306.11644) (juin 2023), [Phi 3](https://arxiv.org/abs/2404.14219) (avril 2024) et [Smaller, Weaker, Yet Better](http://www.arxiv.org/abs/2408.16737) (août 2024)
+7. Synthetic datasets : [Textbooks are all you need](https://arxiv.org/abs/2306.11644) (juin 2023) et [Smaller, Weaker, Yet Better](http://www.arxiv.org/abs/2408.16737) (août 2024)
 
 
 
