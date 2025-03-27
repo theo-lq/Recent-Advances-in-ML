@@ -6,7 +6,7 @@
 ## Promotion 2024 - 2025
 Les supports, les TP et le poly sont mis à jour tout au long du cours.
 * Séance 1 (06/01/2025) - Bon départ d'un réseau de neurones
-* Séance 2 (16/01/2025) - Introduction à la calibration@
+* Séance 2 (16/01/2025) - Introduction à la calibration
 * Séance 3 (30/01/2025) - Mise à jour moderne des poids
 * Séance 4 (06/03/2025) - Avancées des LLM pour les réseaux de neurones
 * Séance 5 (20/03/2025) - Tokens
