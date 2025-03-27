@@ -1,0 +1,12 @@
+\babel@toc {french}{}\relax 
+\beamer@sectionintoc {1}{Comment bien modifier la valeur du learning rate ?\unhbox \voidb@x \cleaders \hbox to0.8em{\hss .\hss }\hfill \kern \z@ 1}{2}{0}{1}
+\beamer@subsectionintoc {1}{1}{Il faut modifier la valeur du learning rate\unhbox \voidb@x \cleaders \hbox to0.8em{\hss .\hss }\hfill \kern \z@ 2}{3}{0}{1}
+\beamer@subsectionintoc {1}{2}{Échéanciers des Transformers\unhbox \voidb@x \cleaders \hbox to0.8em{\hss .\hss }\hfill \kern \z@ 7}{10}{0}{1}
+\beamer@sectionintoc {2}{Quelles sont les bonnes non-linéarité dans un réseau de neurones ?\unhbox \voidb@x \cleaders \hbox to0.8em{\hss .\hss }\hfill \kern \z@ 11}{14}{0}{2}
+\beamer@subsectionintoc {2}{1}{GELU et SiLU\unhbox \voidb@x \cleaders \hbox to0.8em{\hss .\hss }\hfill \kern \z@ 12}{15}{0}{2}
+\beamer@subsectionintoc {2}{2}{Gated Linear Unit\unhbox \voidb@x \cleaders \hbox to0.8em{\hss .\hss }\hfill \kern \z@ 14}{17}{0}{2}
+\beamer@sectionintoc {3}{Comment appliquer les avancées du NLP pour la vision ?\unhbox \voidb@x \cleaders \hbox to0.8em{\hss .\hss }\hfill \kern \z@ 18}{21}{0}{3}
+\beamer@subsectionintoc {3}{1}{Vision Transformers\unhbox \voidb@x \cleaders \hbox to0.8em{\hss .\hss }\hfill \kern \z@ 20}{24}{0}{3}
+\beamer@subsectionintoc {3}{2}{ConvNeXt\unhbox \voidb@x \cleaders \hbox to0.8em{\hss .\hss }\hfill \kern \z@ 23}{27}{0}{3}
+\beamer@sectionintoc {1}{Annexe : SGD par mini-batch\unhbox \voidb@x \cleaders \hbox to0.8em{\hss .\hss }\hfill \kern \z@ 29}{33}{1}{1}
+\beamer@sectionintoc {2}{Annexe : Preuves\unhbox \voidb@x \cleaders \hbox to0.8em{\hss .\hss }\hfill \kern \z@ 33}{37}{1}{2}

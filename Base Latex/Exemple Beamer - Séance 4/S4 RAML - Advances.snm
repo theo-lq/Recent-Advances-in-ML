@@ -1,0 +1,8 @@
+\beamer@slide {hyp:tirage}{7}
+\beamer@slide {eq:ExpectedDescent}{7}
+\beamer@slide {thm:SGD_fixed_LR}{8}
+\beamer@slide {fig:schedule_attention}{10}
+\beamer@slide {fig:LSTM}{17}
+\beamer@slide {prop:VarianceMiniBatch}{35}
+\beamer@slide {thm:SGD_MiniBatch}{36}
+\beamer@slide {eq:ExpectedDescentMiniBatch}{40}

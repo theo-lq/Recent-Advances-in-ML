@@ -1,0 +1,277 @@
+
+% Copyright (c) 2022 by Lars Spreng
+% This work is licensed under the Creative Commons Attribution 4.0 International License. 
+% To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Add your packages and commands to this file
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\RequirePackage{palatino}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+
+\usefonttheme{serif}
+
+\usepackage{styles/elegantmacros}
+\usefolder{styles}
+\usetheme[style=blue]{elegant}
+
+\newcommand{\makepart}[1]{ % For convenience
+\part{#1} \frame{\partpage}
+}
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Figures
+\RequirePackage{booktabs}
+\RequirePackage{colortbl}
+\RequirePackage{ragged2e}
+\RequirePackage{schemabloc}
+
+\RequirePackage{caption}
+\RequirePackage{subcaption}
+\RequirePackage{tabularx}
+\RequirePackage{array}
+\RequirePackage{multirow}
+
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Figures
+\RequirePackage{wrapfig}
+\RequirePackage{pgfplots}
+\RequirePackage{graphicx}
+\RequirePackage{adjustbox}
+\RequirePackage{environ}
+\pgfplotsset{compat=1.18}
+
+\makeatletter
+\newsavebox{\measure@tikzpicture}
+\NewEnviron{scaletikzpicturetowidth}[1]{%
+  \def\tikz@width{#1}%
+  \def\tikzscale{1}\begin{lrbox}{\measure@tikzpicture}%
+  \BODY
+  \end{lrbox}%
+  \pgfmathparse{#1/\wd\measure@tikzpicture}%
+  \edef\tikzscale{\pgfmathresult}%
+  \BODY
+}
+\makeatother
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Maths 
+\RequirePackage{textcomp}
+\RequirePackage{amsmath} 
+\RequirePackage{amsthm}
+\RequirePackage{mathtools}
+
+
+\setbeamertemplate{theorems}[numbered] % to number
+
+
+\providecommand{\H}{\mathscr{H}}      
+\providecommand{\E}{\mathbb{E}}
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\usepackage[T1]{fontenc}
+\usepackage{amsthm}
+\usepackage[french]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{graphicx}
+\frenchbsetup{StandardLists=true} 
+\usepackage[all]{xy}
+\usepackage{dsfont} 
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{makeidx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{appendix}
+\usepackage{url}
+\usepackage{environ}
+\usepackage{pgfplots}
+
+\usepackage[ruled, vlined, noend]{algorithm2e}
+\SetKw{Continue}{continue}
+
+\usepackage{tikz}
+\usetikzlibrary{tikzmark}
+\usepackage{tikz-3dplot}
+\usepackage{tcolorbox}
+\usetikzlibrary{positioning}
+\newcommand{\highlight}[2]{\colorbox{#1!17}{$\displaystyle #2$}}
+
+
+
+\def\layersep{1.5}
+\def\nodesep{1}
+
+
+\makeindex
+
+\setcounter{tocdepth}{2}
+
+
+
+
+\newcommand{\lemme}[1]{
+	\noindent
+	\begin{tabular}{|c}
+		\begin{minipage}{\textwidth}
+    			\raggedright{\begin{lem} #1\end{lem}}
+		\end{minipage}
+	\end{tabular}
+}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\MSE}{MSE}
+\DeclareMathOperator{\RMSE}{RMSE}
+\DeclareMathOperator{\Bias}{Bias}
+\DeclareMathOperator{\TPR}{TPR}
+\DeclareMathOperator{\FPR}{FPR}
+\DeclareMathOperator{\Trace}{Tr}
+\newcommand{\probability}[1]{\mathbb{P}\left(\displaystyle #1 \right)}
+\newcommand{\variance}[1]{\mathbb{V}\left[\displaystyle #1 \right]}
+%\newcommand{\expectation}[1]{\mathbb{E}\left[\displaystyle #1 \right]}
+\newcommand{\expectation}[2][]{\underset{#1}{\mathbb{E}}\left[\displaystyle #2 \right]}
+\newcommand{\Tr}[1]{\Trace\left(#1 \right)}
+\DeclareMathOperator{\ReLU}{ReLU}
+\DeclareMathOperator{\GELU}{GELU}
+\DeclareMathOperator{\SiLU}{SiLU}
+\DeclareMathOperator{\SwiGLU}{SwiGLU}
+\DeclareMathOperator{\GEGLU}{GEGLU}
+\newcommand{\independant}{\perp \!\!\! \perp}
+\newcommand{\loss}[1]{\mathcal{L}\left(#1\right)}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\dCE}{\mathrm{dCE}}
+\DeclareMathOperator{\calibrate}{\mathrm{cal}}
+\DeclareMathOperator{\smCE}{smCE}
+\DeclareMathOperator{\pGap}{\mathrm{pGap}}
+\DeclareMathOperator{\dual}{\mathrm{dual}}
+\newcommand{\texthighlight}[1]{\textbf{\color{primary}#1}}
+
+
+\definecolor{yellow}{RGB}{252, 220, 18} %FCBC12
+
+\NewEnviron{customquote}[2]{
+	\begin{center}
+		\begin{minipage}{0.85\textwidth}
+			\begin{textit}
+				 \BODY\ \\
+			\end{textit}
+			\begin{footnotesize}
+				--- #1 (#2)
+			\end{footnotesize}
+		\end{minipage}
+	\end{center}
+}
+\newtheorem{exercice}{Exercice}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theoreme}{Théorème}
+\newtheorem{definition_self}{Définition}
+\newtheorem{hypothese}{Hypothèse}
+\newtheorem{corollaire}{Corollaire}
+
+
+
+\usepackage[protrusion=true, expansion=true]{microtype} 
+
+
+\tikzset{
+	cuboid/.pic = {
+		\tikzset{%
+      			every edge quotes/.append style={midway, auto},
+      			/cuboid/.cd,
+      			#1
+   		 }
+		\draw[thick, pic actions] (0, 0, 0)  -- ++(-\cubeLayerx*\cubeScale, 0, 0) -- ++(0, -\cubeLayery*\cubeScale, 0) -- ++(\cubeLayerx*\cubeScale, 0, 0)  -- cycle;
+		\draw[thick, pic actions] (0, 0, 0) -- ++(0, 0, -\cubeLayerz*\cubeScale) -- ++(0, -\cubeLayery*\cubeScale, 0) -- ++(0, 0, \cubeLayerz*\cubeScale) -- cycle;
+		\draw[thick, pic actions] (0, 0, 0) -- ++(-\cubeLayerx*\cubeScale, 0, 0) -- ++(0, 0, -\cubeLayerz*\cubeScale) -- ++(\cubeLayerx*\cubeScale, 0, 0) -- cycle;
+	},
+	/cuboid/.search also={/tikz},
+  	/cuboid/.cd,
+	width/.store in=\cubeLayerx,
+  	height/.store in=\cubeLayery,
+  	depth/.store in=\cubeLayerz,
+	scale/.store in=\cubeScale,
+ 	width=10,
+ 	height=10,
+ 	depth=10,
+	scale=1
+}
+
+
+\tikzset{
+	layer/.pic = {
+		\tikzset{/layer/.cd, #1}
+		\pgfmathsetmacro{\size}{\matrixSize / 2}
+		\foreach \index in {\matrixChannels, ..., 1}{
+			\pgfmathsetmacro{\scaledIndex}{(1/sqrt(\matrixChannels)) * (1 - \index)}
+			\draw[thick, pic actions] (\scaledIndex, -\size, -\size) -- (\scaledIndex, -\size, \size) -- (\scaledIndex, \size, \size) -- (\scaledIndex, \size, -\size) -- cycle;
+		}
+		
+		\pgfmathsetmacro{\index}{(1/sqrt(\matrixChannels)) * (1-\matrixChannels)}
+		\draw (\index, -\size, -\size)+(-3.5pt, -3.5pt)coordinate(edge_last);
+		\draw[pic actions, |-|, midway, auto] (0, -\size, -\size)+(-3.5pt, -3.5pt) -- node[sloped, below]{\matrixChannels} (edge_last);
+		\draw[thick, ->] (0, 0, 0) -- (\spaceEnd, 0, 0);
+	},
+	/layer/.search also={/tikz},
+  	/layer/.cd,
+	size/.store in=\matrixSize,
+	channels/.store in=\matrixChannels,
+	space/.store in=\spaceEnd,
+	size=3,
+ 	channels=1,
+	space=1
+}
+
+
+\tikzset{
+	cuboidArchi/.pic = {
+		\tikzset{/cuboidArchi/.cd, #1}
+		\draw[thick, pic actions] (0, -\width/2, -\height/2)  coordinate(a)-- ++(-\depth, 0, 0) coordinate(b) -- ++(0, 0, \height) coordinate(d) -- ++(\depth, 0, 0) -- cycle;
+		\draw[thick, pic actions] (0, -\width/2, -\height/2) -- ++(0, \width, 0) coordinate(c)-- ++(0, 0, \height) -- ++(0, -\width, 0) -- cycle;
+		\draw[thick, pic actions] (0, -\width/2, \height/2) -- ++(-\depth, 0, 0) -- ++(0, \width, 0) -- ++(\depth, 0, 0) -- cycle;
+		
+		\draw (b)+(-3pt, -3pt) coordinate(b1);
+		\draw[pic actions, |-|, midway] (a) +(-3pt, -3pt) -- node[sloped, below]{\depthText} (b1);
+		\draw (c)+(2pt, -3pt) coordinate(c1);
+		\draw[pic actions, |-|, midway] (a) +(2pt, -3pt) -- node[sloped, below]{\widthText} (c1);
+		\draw (d)+(-5pt, 0) coordinate(d1);
+		\draw[pic actions, |-|, midway] (b) +(-5pt, 0) -- node[sloped, above]{\heightText} (d1);
+	},
+	/cuboidArchi/.search also={/tikz},
+  	/cuboidArchi/.cd,
+	width/.store in=\width,
+	width text/.store in=\widthText,
+  	height/.store in=\height,
+	height text/.store in=\heightText,
+  	depth/.store in=\depth,
+	depth text/.store in=\depthText,
+ 	width=10,
+	width text=10,
+ 	height=10,
+	height text = 10,
+ 	depth=10,
+	depth text = 10
+}
+
+

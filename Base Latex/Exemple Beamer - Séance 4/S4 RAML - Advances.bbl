@@ -1,0 +1,115 @@
+\begin{thebibliography}{}
+
+\bibitem[Bello et~al., 2019]{bello2019attention}
+Bello, I., Zoph, B., Vaswani, A., Shlens, J., and Le, Q.~V. (2019).
+\newblock Attention augmented convolutional networks.
+\newblock In {\em Proceedings of the IEEE/CVF international conference on
+  computer vision}, pages 3286--3295.
+
+\bibitem[Dauphin et~al., 2016]{dauphin2016language}
+Dauphin, Y.~N., Fan, A., Auli, M., and Grangier, D. (2016).
+\newblock Language modeling with gated convolutional networks.
+\newblock In {\em International conference on machine learning}, pages
+  933--941. PMLR.
+
+\bibitem[Dosovitskiy et~al., 2020]{dosovitskiy2020image}
+Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X.,
+  Unterthiner, T., Dehghani, M., Minderer, M., Heigold, G., Gelly, S., et~al.
+  (2020).
+\newblock An image is worth 16x16 words: Transformers for image recognition at
+  scale.
+\newblock {\em arXiv preprint arXiv:2010.11929}.
+
+\bibitem[He et~al., 2016]{he2016deep}
+He, K., Zhang, X., Ren, S., and Sun, J. (2016).
+\newblock Deep residual learning for image recognition.
+\newblock In {\em Proceedings of the IEEE conference on computer vision and
+  pattern recognition}.
+
+\bibitem[Hendrycks and Gimpel, 2016]{hendrycks2016gaussian}
+Hendrycks, D. and Gimpel, K. (2016).
+\newblock Gaussian error linear units (gelus).
+\newblock {\em arXiv preprint arXiv:1606.08415}.
+
+\bibitem[Hoffmann et~al., 2022]{Chinchilla}
+Hoffmann, J., Borgeaud, S., Mensch, A., Buchatskaya, E., Cai, T., Rutherford,
+  E., Casas, D. d.~L., Hendricks, L.~A., Welbl, J., Clark, A., et~al. (2022).
+\newblock Training compute-optimal large language models.
+\newblock {\em arXiv preprint arXiv:2203.15556}.
+
+\bibitem[Krizhevsky et~al., 2012]{krizhevsky2012imagenet}
+Krizhevsky, A., Sutskever, I., and Hinton, G.~E. (2012).
+\newblock Imagenet classification with deep convolutional neural networks.
+\newblock {\em Advances in neural information processing systems}.
+
+\bibitem[LeCun et~al., 1998]{lecun1998gradient}
+LeCun, Y., Bottou, L., Bengio, Y., and Haffner, P. (1998).
+\newblock Gradient-based learning applied to document recognition.
+\newblock {\em Proceedings of the IEEE}.
+
+\bibitem[LeCun et~al., 2010]{lecun2010mnist}
+LeCun, Y., Cortes, C., and Burges, C. (2010).
+\newblock Mnist handwritten digit database.
+\newblock {\em ATT Labs [Online]. Available: http://yann.lecun.com/exdb/mnist},
+  2.
+
+\bibitem[Liu et~al., 2022]{liu2022convnet}
+Liu, Z., Mao, H., Wu, C.-Y., Feichtenhofer, C., Darrell, T., and Xie, S.
+  (2022).
+\newblock A convnet for the 2020s.
+\newblock In {\em Proceedings of the IEEE/CVF conference on computer vision and
+  pattern recognition}, pages 11976--11986.
+
+\bibitem[Loshchilov and Hutter, 2016]{loshchilov2016Cosine}
+Loshchilov, I. and Hutter, F. (2016).
+\newblock Sgdr: Stochastic gradient descent with warm restarts.
+\newblock {\em arXiv preprint arXiv:1608.03983}.
+
+\bibitem[Popel and Bojar, 2018]{popel2018training}
+Popel, M. and Bojar, O. (2018).
+\newblock Training tips for the transformer model.
+\newblock {\em arXiv preprint arXiv:1804.00247}.
+
+\bibitem[Shazeer, 2020]{shazeer2020glu}
+Shazeer, N. (2020).
+\newblock Glu variants improve transformer.
+\newblock {\em arXiv preprint arXiv:2002.05202}.
+
+\bibitem[Simonyan and Zisserman, 2014]{simonyan2014very}
+Simonyan, K. and Zisserman, A. (2014).
+\newblock Very deep convolutional networks for large-scale image recognition.
+\newblock {\em arXiv preprint arXiv:1409.1556}.
+
+\bibitem[Smith, 2017]{smith2017Cyclical}
+Smith, L.~N. (2017).
+\newblock Cyclical learning rates for training neural networks.
+\newblock In {\em 2017 IEEE winter conference on applications of computer
+  vision (WACV)}, pages 464--472. IEEE.
+
+\bibitem[Szegedy et~al., 2015]{szegedy2015going}
+Szegedy, C., Liu, W., Jia, Y., Sermanet, P., Reed, S., Anguelov, D., Erhan, D.,
+  Vanhoucke, V., and Rabinovich, A. (2015).
+\newblock Going deeper with convolutions.
+\newblock In {\em Proceedings of the IEEE conference on computer vision and
+  pattern recognition}.
+
+\bibitem[Vaswani et~al., 2017]{vaswani2017attention}
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.~N.,
+  Kaiser, {\L}., and Polosukhin, I. (2017).
+\newblock Attention is all you need.
+\newblock {\em Advances in neural information processing systems}, 30.
+
+\bibitem[Wu et~al., 2020]{wu2020visual}
+Wu, B., Xu, C., Dai, X., Wan, A., Zhang, P., Yan, Z., Tomizuka, M., Gonzalez,
+  J., Keutzer, K., and Vajda, P. (2020).
+\newblock Visual transformers: Token-based image representation and processing
+  for computer vision.
+\newblock {\em arXiv preprint arXiv:2006.03677}.
+
+\bibitem[Xiao et~al., 2017]{fashionMNIST}
+Xiao, H., Rasul, K., and Vollgraf, R. (2017).
+\newblock Fashion-mnist: a novel image dataset for benchmarking machine
+  learning algorithms.
+\newblock {\em CoRR}.
+
+\end{thebibliography}
