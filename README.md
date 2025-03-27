@@ -8,10 +8,10 @@ Les supports, les TP et le poly sont mis à jour tout au long du cours.
 * Séance 1 (06/01/2025) - Bon départ d'un réseau de neurones
 * Séance 2 (16/01/2025) - Introduction à la calibration@
 * Séance 3 (30/01/2025) - Mise à jour moderne des poids
-* Séance 4 (06/03/2025) - Avancées des LLM pour les réseaux de neurones ([feedback](https://forms.gle/LZCiar8KNK3Wkfm98))
-* Séance 5 (../../....) - ...
-* Séance 6 (20/03/2025) - Préparation de la soutenance
-* Séance 7 (27/03/2025) - Soutenance
+* Séance 4 (06/03/2025) - Avancées des LLM pour les réseaux de neurones
+* Séance 5 (20/03/2025) - Tokens
+* Séance 6 (27/03/2025) - Préparation de la soutenance
+* Séance 7 (03/04/2025) - Soutenance
 
 La soutenance est une présentation à l'ensemble de la promotion portant soit sur un ou plusieurs articles de recherche, soit sur une question soulevée par le cours et/ou les TP. Les articles de recherches candidats sont :
 1. Fine-Tuning : [LoRA](https://arxiv.org/abs/2106.09685) (juin 2021) et [DoRA](https://arxiv.org/abs/2402.09353) (février 2024)
