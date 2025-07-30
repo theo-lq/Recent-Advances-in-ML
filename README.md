@@ -2,6 +2,7 @@
 
 > [!IMPORTANT]
 > Les documents sont mis à jour au fil des séances et supprimés chaque année. Si vous avez besoin de l'ensemble des documents, contactez-moi directement.
+> Ils sont pour le moment tous indisponible pour cause de révision pour l'année scolaire 2025-2026.
 
 ## Promotion 2024 - 2025
 Les supports, les TP et le poly sont mis à jour tout au long du cours.
